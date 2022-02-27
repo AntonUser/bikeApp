@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/routes"
+    app:startDestination="@id/home">
+
+    <fragment
+        android:id="@+id/home"
+        android:name="com.example.bikeapp.BikeParametersFragment"
+        android:label="fragment_bike_parameters"
+        tools:layout="@layout/fragment_bike_parameters" >
+        <action
+            android:id="@+id/action_home_to_account2"
+            app:destination="@id/account" />
+        <action
+            android:id="@+id/action_home_to_newLine2"
+            app:destination="@id/newLine" />
+    </fragment>
+    <fragment
+        android:id="@+id/newLine"
+        android:name="com.example.bikeapp.NewsLineFragment"
+        android:label="fragment_news_line"
+        tools:layout="@layout/fragment_news_line" >
+        <action
+            android:id="@+id/action_newLine_to_home2"
+            app:destination="@id/home" />
+        <action
+            android:id="@+id/action_newLine_to_account2"
+            app:destination="@id/account" />
+    </fragment>
+    <fragment
+        android:id="@+id/account"
+        android:name="com.example.bikeapp.ProfileFragment"
+        android:label="fragment_profile"
+        tools:layout="@layout/fragment_profile" >
+        <action
+            android:id="@+id/action_account_to_newLine2"
+            app:destination="@id/newLine" />
+        <action
+            android:id="@+id/action_account_to_home2"
+            app:destination="@id/home" />
+    </fragment>
+</navigation>
