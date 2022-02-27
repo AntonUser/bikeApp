@@ -3,7 +3,6 @@ package com.example.bikeapp;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothGatt;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,8 +16,6 @@ import androidx.navigation.ui.NavigationUI;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.Set;
-
-import static android.bluetooth.BluetoothDevice.TRANSPORT_LE;
 
 public class MainActivity extends AppCompatActivity {
     private final String TAG = "bikeApp";
@@ -34,19 +31,19 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "OnCreate");
         setContentView(R.layout.activity_main);
         setUpNavigation();
-        BluetoothDevice device = null;
+       // BluetoothDevice device = null;
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter == null) {
             Log.d(TAG, "Устройство не поддерживает bluetooth");
         }
         enableBt();
-        Set<BluetoothDevice> bluetoothDevices = bluetoothAdapter.getBondedDevices();
-        for (BluetoothDevice bluetoothDevice : bluetoothDevices) {
-            if (bluetoothDevice.getName().equals("BTMR-6313")) {
-                device = bluetoothDevice;
-                break;
-            }
-        }
+//        Set<BluetoothDevice> bluetoothDevices = bluetoothAdapter.getBondedDevices();
+//        for (BluetoothDevice bluetoothDevice : bluetoothDevices) {
+//            if (bluetoothDevice.getName().equals("BTMR-6313")) {
+//                device = bluetoothDevice;
+//                break;
+//            }
+//        }
         // BluetoothGatt gatt = device.connectGatt(this, true, bluetoothGattCallback, TRANSPORT_LE);
 //        gatt.connect();
     }
