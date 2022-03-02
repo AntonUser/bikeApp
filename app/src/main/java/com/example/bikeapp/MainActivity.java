@@ -4,13 +4,21 @@ package com.example.bikeapp;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
@@ -25,14 +33,25 @@ import java.util.UUID;
 public class MainActivity extends AppCompatActivity {
     private final String TAG = "bikeApp";
     private BluetoothAdapter bluetoothAdapter;
-    private boolean success = false;
-    private ConnectThread connectThread;
     public static BluetoothSocket mmSocket;
     public static Handler handler;
-    private ConnectedThread connectedThread;
     private ActivityResultLauncher<Intent> mStartForResult = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
             result -> {
             });
+    private ArrayAdapter<BluetoothDevice> mArrayAdapter;
+    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                // Добавляем в адаптер ListView.
+                mArrayAdapter.add(device);
+                mArrayAdapter.notifyDataSetChanged();
+            }
+        }
+    };
+
 
     private final static int CONNECTING_STATUS = 1; // used in bluetooth handler to identify message status
     private final static int MESSAGE_READ = 2; // used in bluetooth handler to identify message update
@@ -47,16 +66,16 @@ public class MainActivity extends AppCompatActivity {
         if (bluetoothAdapter == null) {
             Log.d(TAG, "Устройство не поддерживает bluetooth");
         }
-        //   MyUUID.initializeUUID();
-        for (BluetoothDevice bluetoothDevice : bluetoothAdapter.getBondedDevices()) {
-            if (bluetoothDevice.getName().equals("BTMR-6313")) {
-                connectThread = new ConnectThread(bluetoothAdapter, bluetoothDevice.getAddress());
-                break;
-            }
-        }
-        connectThread.run();
+        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+        registerReceiver(mReceiver, filter);
+//        for (BluetoothDevice bluetoothDevice : bluetoothAdapter.getBondedDevices()) {
+//            if (bluetoothDevice.getName().equals("BTMR-6313")) {
+//                connectThread = new ConnectThread(bluetoothAdapter, bluetoothDevice.getAddress());
+//                break;
+//            }
+//        }
+        //     connectThread.run();
     }
-
 
     @Override
     protected void onStart() {
@@ -66,6 +85,25 @@ public class MainActivity extends AppCompatActivity {
             mStartForResult.launch(enableBtIntent);
         }
         super.onStart();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.bt_menu_button) {
+            if (bluetoothAdapter.isEnabled()) {
+                Intent i = new Intent(MainActivity.this, BtListActivity.class);
+                startActivity(i);
+            } else {
+                Toast.makeText(MainActivity.this, "Пожалуйста включите блютуз для перехода в список устройств", Toast.LENGTH_SHORT).show();
+            }
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void setUpNavigation() {
@@ -89,7 +127,6 @@ public class MainActivity extends AppCompatActivity {
             }
             mmSocket = tmp;
         }
-
 
         public void run() {
             BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
