@@ -1,80 +1,71 @@
-
 package com.example.bikeapp;
 
+import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
+import com.example.bikeapp.adapter.Constants;
+import com.example.bikeapp.database.HelperFactory;
+import com.example.bikeapp.geoposition.MyLocationListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
     private final String TAG = "bikeApp";
     private BluetoothAdapter bluetoothAdapter;
-    public static BluetoothSocket mmSocket;
-    public static Handler handler;
+    private SharedPreferences preference;
     private ActivityResultLauncher<Intent> mStartForResult = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
             result -> {
             });
-    private ArrayAdapter<BluetoothDevice> mArrayAdapter;
-    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                // Добавляем в адаптер ListView.
-                mArrayAdapter.add(device);
-                mArrayAdapter.notifyDataSetChanged();
-            }
-        }
-    };
-
-
-    private final static int CONNECTING_STATUS = 1; // used in bluetooth handler to identify message status
-    private final static int MESSAGE_READ = 2; // used in bluetooth handler to identify message update
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (ActivityCompat.checkSelfPermission(this,//запрашиваем разрешение на геолокацию
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this,
+                        Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION}, 23);
+
+        }
         Log.d(TAG, "OnCreate");
         setContentView(R.layout.activity_main);
         setUpNavigation();
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        preference = getSharedPreferences(Constants.MY_PREFERENCE, Context.MODE_PRIVATE);
+        Log.d(TAG, "Mac : " + preference.getString(Constants.MAC_KEY, "no bt selected"));
+        HelperFactory.setHelper(getApplicationContext());
         if (bluetoothAdapter == null) {
             Log.d(TAG, "Устройство не поддерживает bluetooth");
         }
-        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        registerReceiver(mReceiver, filter);
-//        for (BluetoothDevice bluetoothDevice : bluetoothAdapter.getBondedDevices()) {
-//            if (bluetoothDevice.getName().equals("BTMR-6313")) {
-//                connectThread = new ConnectThread(bluetoothAdapter, bluetoothDevice.getAddress());
-//                break;
-//            }
-//        }
-        //     connectThread.run();
+
+        final Context mainContext = this;
+
+        MyLocationListener.SetUpLocationListener(mainContext);//.start();//запускаем обработку местоположений
+    }
+
+    @Override
+    protected void onDestroy() {
+        HelperFactory.releaseHelper();
+        super.onDestroy();
     }
 
     @Override
@@ -106,6 +97,7 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    //навигация внизу активити
     private void setUpNavigation() {
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigation);
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
@@ -113,88 +105,5 @@ public class MainActivity extends AppCompatActivity {
         if (navHostFragment == null) return;
         NavigationUI.setupWithNavController(bottomNavigationView,
                 navHostFragment.getNavController());
-    }
-
-    private class ConnectThread extends Thread {
-        public ConnectThread(BluetoothAdapter bluetoothAdapter, String address) {
-            BluetoothDevice bluetoothDevice = bluetoothAdapter.getRemoteDevice(address);
-            BluetoothSocket tmp = null;
-            UUID uuid = bluetoothDevice.getUuids()[0].getUuid();
-            try {
-                tmp = bluetoothDevice.createInsecureRfcommSocketToServiceRecord(uuid);
-            } catch (IOException ex) {
-                Log.e(TAG, "Socket's create() method failed", ex);
-            }
-            mmSocket = tmp;
-        }
-
-        public void run() {
-            BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-            bluetoothAdapter.cancelDiscovery();
-            try {
-                // Connect to the remote device through the socket. This call blocks
-                // until it succeeds or throws an exception.
-                mmSocket.connect();
-                Log.e("Status", "Device connected");
-                handler.obtainMessage(CONNECTING_STATUS, 1, -1).sendToTarget();
-            } catch (IOException connectException) {
-                // Unable to connect; close the socket and return.
-                try {
-                    mmSocket.close();
-                    Log.e("Status", "Cannot connect to device");
-                    handler.obtainMessage(CONNECTING_STATUS, -1, -1).sendToTarget();
-                } catch (IOException closeException) {
-                    Log.e(TAG, "Could not close the client socket", closeException);
-                }
-                return;
-            }
-        }
-    }
-
-    private class ConnectedThread extends Thread {
-
-        private final InputStream inputStream;
-        private final OutputStream outputStream;
-
-        public ConnectedThread(BluetoothSocket bluetoothSocket) {
-            InputStream inputStream = null;
-            OutputStream outputStream = null;
-
-            try {
-                inputStream = bluetoothSocket.getInputStream();
-                outputStream = bluetoothSocket.getOutputStream();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            this.inputStream = inputStream;
-            this.outputStream = outputStream;
-        }
-
-        @Override
-        public void run() {
-
-        }
-
-        public void write(String command) {
-            byte[] bytes = command.getBytes();
-            if (outputStream != null) {
-                try {
-                    outputStream.write(bytes);
-                    outputStream.flush();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        public void cancel() {
-            try {
-                inputStream.close();
-                outputStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
     }
 }

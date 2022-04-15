@@ -6,9 +6,9 @@
         android:icon="@drawable/ic_house"
         android:title="" />
     <item
-        android:id = "@+id/newLine"
+        android:id = "@id/mapsFragment"
         android:enabled="true"
-        android:icon="@drawable/ic_vector"
+        android:icon="@drawable/ic_geoalt"
         android:title="" />
     <item
         android:id = "@+id/account"

@@ -5,4 +5,10 @@
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="search">Search</string>
+    <string name="btmenu">btMenu</string>
+    <string name="title_item_name">Найденные устройства</string>
+    <string name="discovery_status">Поиск устройств…</string>
+    <string name="connect">connect</string>
+    <string name="_0">0</string>
 </resources>

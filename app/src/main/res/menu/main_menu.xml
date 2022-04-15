@@ -4,6 +4,6 @@
     <item
         android:id="@+id/bt_menu_button"
         android:icon="@drawable/ic_baseline_menu_24"
-        android:title="btMenu"
+        android:title="@string/btmenu"
         app:showAsAction="ifRoom" />
 </menu>

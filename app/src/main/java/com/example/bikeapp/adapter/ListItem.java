@@ -1,30 +1,34 @@
 package com.example.bikeapp.adapter;
 
+import android.bluetooth.BluetoothDevice;
+
 import java.util.Objects;
 
 public class ListItem {
-    private String name;
-    private String address;
+    private BluetoothDevice bluetoothDevice;
+    private String itemType = BtAdapter.ITEM_SAVED; // saved/searched/title
 
-    public ListItem(String name, String address) {
-        this.name = name;
-        this.address = address;
+    public ListItem() {
     }
 
-    public String getName() {
-        return name;
+    public ListItem(BluetoothDevice bluetoothDevice) {
+        this.bluetoothDevice = bluetoothDevice;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public BluetoothDevice getBluetoothDevice() {
+        return bluetoothDevice;
     }
 
-    public String getAddress() {
-        return address;
+    public void setBluetoothDevice(BluetoothDevice bluetoothDevice) {
+        this.bluetoothDevice = bluetoothDevice;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public String getItemType() {
+        return itemType;
+    }
+
+    public void setItemType(String itemType) {
+        this.itemType = itemType;
     }
 
     @Override
@@ -32,12 +36,12 @@ public class ListItem {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ListItem listItem = (ListItem) o;
-        return Objects.equals(name, listItem.name) &&
-                Objects.equals(address, listItem.address);
+        return Objects.equals(bluetoothDevice, listItem.bluetoothDevice) &&
+                Objects.equals(itemType, listItem.itemType);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, address);
+        return Objects.hash(bluetoothDevice, itemType);
     }
 }
