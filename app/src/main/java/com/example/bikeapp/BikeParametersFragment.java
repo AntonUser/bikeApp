@@ -1,20 +1,24 @@
 package com.example.bikeapp;
 
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
 
 import com.example.bikeapp.bluetooth.BtConnection;
+import com.example.bikeapp.geoposition.LocationLiveData;
+import com.example.bikeapp.geoposition.MyLocationListener;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link BikeParametersFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class BikeParametersFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
@@ -23,41 +27,25 @@ public class BikeParametersFragment extends Fragment {
     private static final String ARG_PARAM2 = "param2";
     private ProgressBar progressBar;
     private BtConnection btConnection;
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private MyLocationListener myLocationListener;
+    private LiveData<Integer> liveData;
+    private TextView speedView;
+    private LocationLiveData locationLiveData;
 
     public BikeParametersFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment BikeParametersFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static BikeParametersFragment newInstance(String param1, String param2) {
-        BikeParametersFragment fragment = new BikeParametersFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
         btConnection = BtConnection.createBtConnection(getActivity());
+        locationLiveData = new LocationLiveData(getActivity());
+        locationLiveData.observe(this, location -> {
+            Log.d("bikeApp", "BikeParamSpeed:" + location.getSpeed());
+            speedView.setText(String.valueOf((int) location.getSpeed()));
+        });
     }
 
     @Override
@@ -68,7 +56,15 @@ public class BikeParametersFragment extends Fragment {
         progressBar.setMax(100);
         progressBar.incrementProgressBy(1);
         progressBar.setProgress(20);
+        MyLocationListener.setUpLocationListener(this.getActivity());
+        myLocationListener = new MyLocationListener();
+        speedView = view.findViewById(R.id.speedView);
         return view;
     }
 
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+    }
 }

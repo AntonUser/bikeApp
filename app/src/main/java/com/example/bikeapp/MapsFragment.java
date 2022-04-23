@@ -87,7 +87,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     GoogleMap.OnMyLocationChangeListener onMyLocationChangeListener =//обработчик перемещений гугл
             // использует также личный  класс MyLocationListener, местоположение берётся из него
             location -> {
-                Log.d("bikeApp", "googleMap listener called");
                 if (isStarted)
                     googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
                             new LatLng(location.getLatitude(), location.getLongitude()), 18));

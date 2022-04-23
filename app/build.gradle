@@ -49,4 +49,8 @@ dependencies {
     implementation 'com.google.android.gms:play-services-maps:18.0.2'
     implementation 'org.slf4j:slf4j-nop:1.7.25'
     implementation group: 'com.j256.ormlite', name: 'ormlite-android', version: '4.45'
+    implementation "android.arch.lifecycle:extensions:1.1.1"
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+
+    annotationProcessor "android.arch.lifecycle:compiler:1.0.0"
 }

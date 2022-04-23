@@ -1,21 +1,29 @@
 package com.example.bikeapp.geoposition;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.util.Log;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
+import androidx.lifecycle.LifecycleObserver;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
 
-public class MyLocationListener implements LocationListener {
+import com.example.bikeapp.R;
+
+public class MyLocationListener implements LocationListener, LifecycleObserver {
 
     public static Location imHere;
 
-    public static void SetUpLocationListener(Context context) // это нужно запустить в самом начале работы программы
+    public static void setUpLocationListener(Context context) // это нужно запустить в самом начале работы программы
     {
         LocationManager locationManager = (LocationManager)
                 context.getSystemService(Context.LOCATION_SERVICE);
@@ -37,7 +45,5 @@ public class MyLocationListener implements LocationListener {
     @Override
     public void onLocationChanged(@NonNull Location location) {
         imHere = location;
-        Log.d("bikeApp", "my location lat " + location.getLatitude() +
-                " lon " + location.getLongitude());
     }
 }

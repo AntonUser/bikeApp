@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
 
         final Context mainContext = this;
 
-        MyLocationListener.SetUpLocationListener(mainContext);//.start();//запускаем обработку местоположений
+        MyLocationListener.setUpLocationListener(mainContext);//.start();//запускаем обработку местоположений
     }
 
     @Override
