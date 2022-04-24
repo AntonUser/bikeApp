@@ -31,12 +31,20 @@ public class ReceiveThread extends Thread {
     @Override
     public void run() {
         buffer = new byte[1024];
+        String inString = "";
         while (true) {
             try {
-//                inputStream.readAllBytes
+
                 int length = inputStream.read(buffer);
                 String message = new String(buffer, 0, length);
-                Log.d(TAG, "message: " + message);
+
+                //клеим строки пока не встретим конец строки
+                inString += message;
+                if (message.charAt(message.length() - 1) == '\n') {
+                    Log.d(TAG, inString);
+                    inString = "";
+                }
+
             } catch (IOException e) {
                 break;
             }
