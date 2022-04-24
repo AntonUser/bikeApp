@@ -13,8 +13,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.LiveData;
 
 public class LocationLiveData extends LiveData<Location> {
-    private LocationManager locationManager;
-    private Context context;
+    private final LocationManager locationManager;
+    private final Context context;
     private final LocationListener listener = location -> setValue(location);
 
     public LocationLiveData(Context context) {
@@ -38,7 +38,7 @@ public class LocationLiveData extends LiveData<Location> {
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 2, listener);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 0, listener);
         Log.d("bikeApp", "onActive");
     }
 

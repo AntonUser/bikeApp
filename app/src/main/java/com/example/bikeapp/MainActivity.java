@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -44,9 +45,7 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
                             Manifest.permission.ACCESS_COARSE_LOCATION}, 23);
-
         }
-        Log.d(TAG, "OnCreate");
         setContentView(R.layout.activity_main);
         setUpNavigation();
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -58,7 +57,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         final Context mainContext = this;
-
         MyLocationListener.setUpLocationListener(mainContext);//.start();//запускаем обработку местоположений
     }
 

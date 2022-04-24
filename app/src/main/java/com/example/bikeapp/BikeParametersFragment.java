@@ -41,10 +41,16 @@ public class BikeParametersFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         btConnection = BtConnection.createBtConnection(getActivity());
+
         locationLiveData = new LocationLiveData(getActivity());
+
         locationLiveData.observe(this, location -> {
-            Log.d("bikeApp", "BikeParamSpeed:" + location.getSpeed());
-            speedView.setText(String.valueOf((int) location.getSpeed()));
+            //переводим полученную скорость из м/с в км/ч
+            long speedKmH = Math.round(location.getSpeed() * 3.6);
+
+            Log.d("bikeApp", "BikeParamSpeed:" + speedKmH);
+
+            speedView.setText(String.valueOf(speedKmH));
         });
     }
 
