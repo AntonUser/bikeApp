@@ -1,4 +1,4 @@
-package com.example.bikeapp.bluetooth;
+ package com.example.bikeapp.bluetooth;
 
 import android.bluetooth.BluetoothSocket;
 import android.util.Log;
