@@ -73,9 +73,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         geoPoints.forEach(element -> line.add(new LatLng(element.getLatitude(),
                 element.getLongitude())));
         if (ActivityCompat.checkSelfPermission(getActivity(),
-                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(getActivity(),
-                        Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.checkSelfPermission(getActivity(),
+                    Manifest.permission.ACCESS_COARSE_LOCATION);
         }
 
         line.width(16f).color(R.color.design_default_color_primary_dark);
@@ -85,40 +85,45 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     }
 
     GoogleMap.OnMyLocationChangeListener onMyLocationChangeListener =//обработчик перемещений гугл
-            // использует также личный  класс MyLocationListener, местоположение берётся из него
-            location -> {
+            // использует также личный  класс MyLocationListener, местоположение берётся из не
+            location ->
+            {
+                double latitude = -91;
+                double longitude = -181;
+                if (MyLocationListener.imHere != null) {
+                    Log.e("TAG", "GPS is on");
+                    latitude = location.getLatitude();
+                    longitude = location.getLongitude();
+                } else {
+                    //This is what you need:
+                    MyLocationListener.setUpLocationListener(this.getActivity());
+                }
                 if (isStarted)
                     googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
                             new LatLng(location.getLatitude(), location.getLongitude()), 18));
-/*                double latDiff = Math.abs(lat - MyLocationListener.imHere.getLatitude());
-                double lonDiff = Math.abs(lon - MyLocationListener.imHere.getLongitude());
-                if (latDiff > accuracy * 0.7 || lonDiff > accuracy * 0.7) {*/
                 Log.d("bikeApp", "new location lat " + location.getLatitude() +
                         " lon " + location.getLongitude());
+
+                Date date = Calendar.getInstance().getTime();//текущая дата
+
+                String dateStr = date.getDate() + "."
+                        + date.getMonth() + "." + (date.getYear() + 1900);//дата "dd.mm.yyyy"
+
+
                 try {
-                    Date date = Calendar.getInstance().getTime();//текущая дата
-
-                    String dateStr = date.getDate() + "."
-                            + date.getMonth() + "." + (date.getYear() + 1900);//дата "dd.mm.yyyy"
-
                     HelperFactory.getHelper().getGeoPointDAO().create(
-                            new GeoPoint(dateStr,
-                                    MyLocationListener.imHere.getLatitude(),
-                                    MyLocationListener.imHere.getLongitude()));
-
+                            new GeoPoint(dateStr, latitude, longitude)
+                    );
                 } catch (SQLException throwables) {
                     Log.e("bikeApp", "error create geopoint. " + throwables.getMessage());
                     throwables.printStackTrace();
                 }
-                line.add(new com.google.android.gms.maps.model.LatLng(
-                        MyLocationListener.imHere.getLatitude(),
-                        MyLocationListener.imHere.getLongitude()));
+
+                if (latitude > -91 || longitude > -181) {
+                    line.add(new com.google.android.gms.maps.model.LatLng(latitude, longitude));
+                }
 
                 googleMap.addPolyline(line);
-/*                    lat = MyLocationListener.imHere.getLatitude();
-                    lon = MyLocationListener.imHere.getLongitude();
-                    accuracy = MyLocationListener.imHere.getAccuracy();
-                }*/
                 isStarted = false;// делается чтобы камера не обнавлялась в дальнейшем, а лишь при первом запуске активити
             };
 }
