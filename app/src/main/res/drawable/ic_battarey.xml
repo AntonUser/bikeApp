@@ -2,7 +2,8 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@android:id/background"
-        android:drawable="@drawable/ic_batteryhalf2" />
+        android:drawable="@drawable/ic_batteryhalf2"
+       />
     <item android:id="@android:id/progress">
         <clip android:drawable="@drawable/ic_batteryhalf" />  <!-- Your progress bar fill drawable(SVG) here -->
     </item>

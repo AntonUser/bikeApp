@@ -17,14 +17,21 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
 import com.example.bikeapp.adapter.Constants;
 import com.example.bikeapp.database.HelperFactory;
+import com.example.bikeapp.database.entities.GeoPoint;
+import com.example.bikeapp.geoposition.LocationLiveData;
 import com.example.bikeapp.geoposition.MyLocationListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import java.sql.SQLException;
+import java.util.Calendar;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
     private final String TAG = "bikeApp";
@@ -37,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
         if (ActivityCompat.checkSelfPermission(this,//запрашиваем разрешение на геолокацию
                 Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this,
@@ -58,6 +66,27 @@ public class MainActivity extends AppCompatActivity {
 
         final Context mainContext = this;
         MyLocationListener.setUpLocationListener(mainContext);//.start();//запускаем обработку местоположений
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        MyLocationListener.setUpLocationListener(this);
+        new LocationLiveData(this).observe(this, location -> {
+            Date date = Calendar.getInstance().getTime();//текущая дата
+            String dateStr = date.getDate() + "."
+                    + date.getMonth() + "." + (date.getYear() + 1900);//дата "dd.mm.yyyy"
+            try {
+                HelperFactory.getHelper().getGeoPointDAO().create(
+                        new GeoPoint(dateStr,
+                                MyLocationListener.imHere.getLatitude(),
+                                MyLocationListener.imHere.getLongitude())
+                );
+            } catch (SQLException throwables) {
+                Log.e("bikeApp", "error create geopoint. " + throwables.getMessage());
+                throwables.printStackTrace();
+            }
+        });
     }
 
     @Override
