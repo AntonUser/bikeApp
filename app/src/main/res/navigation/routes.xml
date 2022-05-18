@@ -21,7 +21,7 @@
         android:id="@+id/account"
         android:name="com.example.bikeapp.ProfileFragment"
         android:label="fragment_profile"
-        tools:layout="@layout/fragment_profile" >
+        tools:layout="@layout/fragment_profile">
         <action
             android:id="@+id/action_account_to_home2"
             app:destination="@id/home" />

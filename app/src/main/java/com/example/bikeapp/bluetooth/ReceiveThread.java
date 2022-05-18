@@ -37,9 +37,10 @@ public class ReceiveThread extends Thread {
 
                 int length = inputStream.read(buffer);
                 String message = new String(buffer, 0, length);
-
+//                Log.d(TAG, message);
                 //клеим строки пока не встретим конец строки
                 inString += message;
+
                 if (message.charAt(message.length() - 1) == '\n') {
                     Log.d(TAG, inString);
                     inString = "";

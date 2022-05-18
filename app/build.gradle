@@ -51,6 +51,6 @@ dependencies {
     implementation group: 'com.j256.ormlite', name: 'ormlite-android', version: '4.45'
     implementation "android.arch.lifecycle:extensions:1.1.1"
     implementation 'androidx.appcompat:appcompat:1.1.0'
-
     annotationProcessor "android.arch.lifecycle:compiler:1.0.0"
+
 }
