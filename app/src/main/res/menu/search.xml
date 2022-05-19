@@ -6,9 +6,4 @@
         android:icon="@drawable/ic_baseline_electric_bike_24"
         android:title="@string/connect"
         app:showAsAction="ifRoom" />
-    <item
-        android:id="@+id/search"
-        android:icon="@drawable/ic_baseline_bluetooth_searching_24"
-        android:title="@string/search"
-        app:showAsAction="ifRoom" />
 </menu>

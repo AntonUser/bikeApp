@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BtAdapter extends ArrayAdapter<ListItem> {
-    public static final String ITEM_TITLE = "title";
     public static final String ITEM_SAVED = "saved";
     public static final String ITEM_SEARCHED = "searched";
     private final List<ListItem> btList;
@@ -36,13 +35,7 @@ public class BtAdapter extends ArrayAdapter<ListItem> {
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        if (ITEM_TITLE.equals(btList.get(position).getItemType())) {
-            convertView = titleItem(convertView, parent);
-        } else {
-            convertView = defaultItem(position, convertView, parent);
-        }
-
-        return convertView;
+        return defaultItem(position, convertView, parent);
     }
 
     private void savePreference(int position) {
@@ -93,15 +86,6 @@ public class BtAdapter extends ArrayAdapter<ListItem> {
                 .equals(btList.get(position).getBluetoothDevice().getAddress()))
             viewHolder.chBtSelected.setChecked(true);
         isDiscoveryItemType = false;
-        return convertView;
-    }
-
-    private View titleItem(View convertView, ViewGroup parent) {
-        boolean isConvertView = false;
-        if (convertView != null) isConvertView = (convertView.getTag() instanceof ViewHolder);
-        if (convertView == null || isConvertView) {
-            convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.bt_list_item_title, null);
-        }
         return convertView;
     }
 }

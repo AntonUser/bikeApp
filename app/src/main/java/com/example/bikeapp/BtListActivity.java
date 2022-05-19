@@ -3,15 +3,10 @@ package com.example.bikeapp;
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.content.BroadcastReceiver;
-import android.content.ClipData;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
@@ -65,18 +60,11 @@ public class BtListActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        IntentFilter intentFilter1 = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        IntentFilter intentFilter2 = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
-        IntentFilter intentFilter3 = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-        registerReceiver(broadcastReceiver, intentFilter1);
-        registerReceiver(broadcastReceiver, intentFilter2);
-        registerReceiver(broadcastReceiver, intentFilter3);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        unregisterReceiver(broadcastReceiver);
     }
 
     @Override
@@ -87,27 +75,9 @@ public class BtListActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-
         switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
-                break;
-            case R.id.search:
-                this.item = item;
-                if (mBluetoothAdapter.isDiscovering()) {
-                    item.setIcon(R.drawable.ic_baseline_bluetooth_searching_24);
-                    mBluetoothAdapter.cancelDiscovery();
-                    getPairedDevices();
-                    return true;
-                }
-                item.setIcon(R.drawable.ic_baseline_bluetooth_24);
-                actionBar.setTitle(R.string.discovery_status);
-                list.clear();
-                ListItem itemTitle = new ListItem();
-                itemTitle.setItemType(BtAdapter.ITEM_TITLE);
-                list.add(itemTitle);
-                adapter.notifyDataSetChanged();
-                mBluetoothAdapter.startDiscovery();
                 break;
             case R.id.connect:
                 btConnection.connect();
@@ -158,29 +128,4 @@ public class BtListActivity extends AppCompatActivity {
         } else {
         }
     }
-
-    private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (BluetoothDevice.ACTION_FOUND.equals(intent.getAction())) {
-                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                Log.d("bikeApp", "discovering : " + device.getName() + " mac:" + device.getAddress());
-                if (device.getName() != null) {
-                    ListItem item = new ListItem(device);
-                    item.setItemType(BtAdapter.ITEM_SEARCHED);
-                    list.add(item);
-                }
-                adapter.notifyDataSetChanged();
-            } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(intent.getAction())) {
-                actionBar.setTitle(R.string.app_name);
-                item.setIcon(R.drawable.ic_baseline_bluetooth_searching_24);
-                getPairedDevices();
-            } else if (BluetoothDevice.ACTION_BOND_STATE_CHANGED.equals(intent.getAction())) {
-                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                if (device.getBondState() == BluetoothDevice.BOND_BONDED) {
-                    getPairedDevices();
-                }
-            }
-        }
-    };
 }
