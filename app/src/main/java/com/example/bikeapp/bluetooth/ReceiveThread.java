@@ -1,7 +1,11 @@
- package com.example.bikeapp.bluetooth;
+package com.example.bikeapp.bluetooth;
 
 import android.bluetooth.BluetoothSocket;
 import android.util.Log;
+
+import com.example.bikeapp.models.InDataModel;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,22 +34,26 @@ public class ReceiveThread extends Thread {
 
     @Override
     public void run() {
-        buffer = new byte[1024];
-        String inString = "";
+        buffer = new byte[6];
         while (true) {
             try {
-
                 int length = inputStream.read(buffer);
                 String message = new String(buffer, 0, length);
-//                Log.d(TAG, message);
-                //клеим строки пока не встретим конец строки
-                inString += message;
 
-                if (message.charAt(message.length() - 1) == '\n') {
-                    Log.d(TAG, inString);
-                    inString = "";
+                if (message != null && !message.isEmpty()) {
+                    if (message.charAt(0) == '.') {
+                        try {
+                            int pos = message.indexOf((char) 13);
+                            if (pos > 0) {
+                                int num = Integer.parseInt(message.substring(1, pos));
+                                EventBus.getDefault().post(new InDataModel(num));
+                                //  Log.d("bikeApp", "Парсинг прошёл успешно");
+                            }
+                        } catch (NumberFormatException ex) {
+                            Log.d(TAG, "Пришло не число");
+                        }
+                    }
                 }
-
             } catch (IOException e) {
                 break;
             }
@@ -59,4 +67,5 @@ public class ReceiveThread extends Thread {
             Log.d(TAG, "Ошибка передачи данных");
         }
     }
+
 }

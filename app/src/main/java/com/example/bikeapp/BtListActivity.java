@@ -3,10 +3,12 @@ package com.example.bikeapp;
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
@@ -23,6 +25,10 @@ import com.example.bikeapp.adapter.Constants;
 import com.example.bikeapp.adapter.ListItem;
 import com.example.bikeapp.bluetooth.BtConnection;
 
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -35,7 +41,6 @@ public class BtListActivity extends AppCompatActivity {
     private BluetoothAdapter mBluetoothAdapter;
     private List<ListItem> list;
     private ActionBar actionBar;
-    private MenuItem item;
     private BtConnection btConnection;
 
     @Override
@@ -129,3 +134,4 @@ public class BtListActivity extends AppCompatActivity {
         }
     }
 }
+

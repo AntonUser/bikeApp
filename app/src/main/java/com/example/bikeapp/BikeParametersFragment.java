@@ -6,7 +6,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -19,6 +18,11 @@ import androidx.lifecycle.LiveData;
 import com.example.bikeapp.bluetooth.BtConnection;
 import com.example.bikeapp.geoposition.LocationLiveData;
 import com.example.bikeapp.geoposition.MyLocationListener;
+import com.example.bikeapp.models.InDataModel;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 public class BikeParametersFragment extends Fragment {
     private ProgressBar progressBar;
@@ -35,7 +39,7 @@ public class BikeParametersFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        btConnection = BtConnection.createBtConnection(getActivity());
+
         locationLiveData = new LocationLiveData(getActivity());
 
         locationLiveData.observe(this, location -> {
@@ -55,7 +59,7 @@ public class BikeParametersFragment extends Fragment {
         progressBar = view.findViewById(R.id.progressBar2);
         progressBar.setMax(100);
         progressBar.incrementProgressBy(1);
-        progressBar.setProgress(50);
+        //progressBar.setProgress(50);
         MyLocationListener.setUpLocationListener(this.getActivity());
         myLocationListener = new MyLocationListener();
         speedView = view.findViewById(R.id.speedView);
@@ -66,5 +70,23 @@ public class BikeParametersFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
+    }
+
+    @Subscribe(threadMode = ThreadMode.BACKGROUND)
+    public void onMessageEvent(InDataModel inData) {
+         progressBar.setProgress(inData.getBatteryСharge());
+         Log.d("bileApp", String.valueOf(inData.getBatteryСharge()));
     }
 }

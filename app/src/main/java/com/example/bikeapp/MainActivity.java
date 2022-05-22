@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -29,7 +28,10 @@ import com.example.bikeapp.database.entities.GeoPoint;
 import com.example.bikeapp.geoposition.LocationLiveData;
 import com.example.bikeapp.geoposition.MyLocationListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.navigation.NavigationBarView;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.sql.SQLException;
 import java.util.Calendar;
@@ -47,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EventBus.getDefault().register(this);
         edit = this.getSharedPreferences("tokens", Context.MODE_PRIVATE).edit();
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
         if (ActivityCompat.checkSelfPermission(this,//запрашиваем разрешение на геолокацию
@@ -96,6 +99,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         HelperFactory.releaseHelper();
+        EventBus.getDefault().unregister(this);
         super.onDestroy();
     }
 
@@ -107,6 +111,7 @@ public class MainActivity extends AppCompatActivity {
             mStartForResult.launch(enableBtIntent);
         }
         super.onStart();
+
     }
 
     @Override
@@ -138,4 +143,10 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(bottomNavigationView,
                 navHostFragment.getNavController());
     }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
 }
+

@@ -50,4 +50,5 @@ public class BtConnection {
     public void sendData(String data) {
         connectThread.getRThread().sendData(data.getBytes());
     }
+
 }
