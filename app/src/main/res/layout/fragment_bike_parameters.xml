@@ -7,9 +7,9 @@
     android:id="@+id/fragment_parameters"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/bike_background"
     android:keepScreenOn="true"
     android:orientation="vertical"
-    android:background="@drawable/bike_background"
     tools:context=".BikeParametersFragment">
 
 
@@ -21,10 +21,10 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
-        android:textColor="@color/white"
         android:fontFamily="@font/maven_pro"
         android:gravity="center_horizontal"
         android:text="@string/_0"
+        android:textColor="@color/white"
         android:textSize="48sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -35,7 +35,7 @@
 
 
     <TextView
-        android:id="@+id/odoView"
+        android:id="@+id/kilometrage"
         android:layout_width="136dp"
         android:layout_height="33dp"
         android:layout_alignParentStart="true"
@@ -44,7 +44,7 @@
         android:layout_alignParentBottom="true"
         android:fontFamily="@font/maven_pro"
         android:gravity="center_horizontal"
-        android:text="000000"
+        android:text="@string/_000000"
         android:textColor="@color/white"
         android:textSize="28sp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -72,8 +72,8 @@
     <ProgressBar
         android:id="@+id/progressBar2"
         style="@android:style/Widget.ProgressBar.Horizontal"
-        android:layout_width="67dp"
-        android:layout_height="59dp"
+        android:layout_width="70dp"
+        android:layout_height="60dp"
         android:progressDrawable="@drawable/ic_battarey"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -96,5 +96,40 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/speedView"
         app:layout_constraintVertical_bias="0.0" />
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/power_bike"
+        android:layout_width="@dimen/_60sdp"
+        android:layout_height="@dimen/_30sdp"
+        android:minHeight="@dimen/_30sdp"
+        android:switchMinWidth="@dimen/_60sdp"
+        android:textOff="@string/_off"
+        android:textOn="@string/_on"
+        app:showText="true"
+        android:textSize="@dimen/_20sdp"
+        android:thumb="@drawable/custom_thumb"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:track="@drawable/custom_track"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.989"
+         />
+
+    <TextView
+        android:id="@+id/chargePercentBattarey"
+        android:layout_width="@dimen/_35sdp"
+        android:layout_height="@dimen/_15sdp"
+        android:text="0%"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="@dimen/_10sdp"
+        app:layout_constraintBottom_toBottomOf="@+id/progressBar2"
+        app:layout_constraintEnd_toEndOf="@+id/progressBar2"
+        app:layout_constraintHorizontal_bias="0.346"
+        app:layout_constraintStart_toStartOf="@+id/progressBar2"
+        app:layout_constraintTop_toTopOf="@+id/progressBar2"
+        app:layout_constraintVertical_bias="0.503" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

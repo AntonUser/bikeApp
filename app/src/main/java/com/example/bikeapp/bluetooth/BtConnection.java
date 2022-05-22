@@ -7,7 +7,7 @@ import android.content.SharedPreferences;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.example.bikeapp.adapter.Constants;
+import com.example.bikeapp.Constants;
 
 public class BtConnection {
     private Context context;

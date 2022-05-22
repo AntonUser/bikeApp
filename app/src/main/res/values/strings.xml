@@ -11,5 +11,8 @@
     <string name="discovery_status">Поиск устройств…</string>
     <string name="connect">connect</string>
     <string name="_0">0</string>
+    <string name="_000000">000000</string>
+    <string name="_off">Вык</string>
+    <string name="_on">Вкл</string>
     <integer name="com_vk_sdk_AppId">8168569</integer>
 </resources>

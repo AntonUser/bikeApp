@@ -55,6 +55,7 @@ public class ReceiveThread extends Thread {
                     }
                 }
             } catch (IOException e) {
+                EventBus.getDefault().post(new InDataModel(0));
                 break;
             }
         }

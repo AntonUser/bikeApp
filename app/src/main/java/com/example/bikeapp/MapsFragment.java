@@ -2,6 +2,7 @@ package com.example.bikeapp;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -90,40 +91,44 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
             {
                 double latitude = -91;
                 double longitude = -181;
-                if (MyLocationListener.imHere != null) {
-                    Log.e("TAG", "GPS is on");
-                    latitude = location.getLatitude();
-                    longitude = location.getLongitude();
-                } else {
-                    //This is what you need:
-                    MyLocationListener.setUpLocationListener(this.getActivity());
-                }
+                float[] results = new float[1];
                 if (isStarted)
                     googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
                             new LatLng(location.getLatitude(), location.getLongitude()), 18));
-                Log.d("bikeApp", "new location lat " + location.getLatitude() +
-                        " lon " + location.getLongitude());
+                Location.distanceBetween(MyLocationListener.imHere.getLatitude(), MyLocationListener.imHere.getLongitude(), latitude, longitude, results);
+                if (results[0] > (MyLocationListener.imHere.getAccuracy() )) {
+                    if (MyLocationListener.imHere != null) {
+                        Log.d("TAG", "GPS is on");
+                        latitude = location.getLatitude();
+                        longitude = location.getLongitude();
+                    } else {
+                        MyLocationListener.setUpLocationListener(this.getActivity());
+                    }
 
-                Date date = Calendar.getInstance().getTime();//текущая дата
+                    Log.d("bikeApp", "new location lat " + location.getLatitude() +
+                            " lon " + location.getLongitude());
 
-                String dateStr = date.getDate() + "."
-                        + date.getMonth() + "." + (date.getYear() + 1900);//дата "dd.mm.yyyy"
+                    Date date = Calendar.getInstance().getTime();//текущая дата
+
+                    String dateStr = date.getDate() + "."
+                            + date.getMonth() + "." + (date.getYear() + 1900);//дата "dd.mm.yyyy"
 
 
-                try {
-                    HelperFactory.getHelper().getGeoPointDAO().create(
-                            new GeoPoint(dateStr, latitude, longitude)
-                    );
-                } catch (SQLException throwables) {
-                    Log.e("bikeApp", "error create geopoint. " + throwables.getMessage());
-                    throwables.printStackTrace();
+                    try {
+                        HelperFactory.getHelper().getGeoPointDAO().create(
+                                new GeoPoint(dateStr, latitude, longitude)
+                        );
+                    } catch (SQLException throwables) {
+                        Log.e("bikeApp", "error create geopoint. " + throwables.getMessage());
+                        throwables.printStackTrace();
+                    }
+
+                    if (latitude > -91 || longitude > -181) {
+                        line.add(new com.google.android.gms.maps.model.LatLng(latitude, longitude));
+                    }
+
+                    googleMap.addPolyline(line);
                 }
-
-                if (latitude > -91 || longitude > -181) {
-                    line.add(new com.google.android.gms.maps.model.LatLng(latitude, longitude));
-                }
-
-                googleMap.addPolyline(line);
                 isStarted = false;// делается чтобы камера не обнавлялась в дальнейшем, а лишь при первом запуске активити
             };
 }
