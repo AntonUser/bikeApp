@@ -102,6 +102,17 @@ public class BikeParametersFragment extends Fragment {
         outData = outData.substring(kilometrage.length()) + kilometrage;
         kilometrageView.setText(outData);
 
+
+        switchPower.setOnClickListener(v -> {
+            editPower.putBoolean(Constants.POWER_PREFERENCE, switchPower.isChecked());
+            editPower.apply();
+            if (switchPower.isChecked()) {
+                view.setBackgroundResource(R.drawable.backgrond2);
+            } else {
+                view.setBackgroundResource(R.drawable.backgrond1);
+            }
+        });
+
         return view;
     }
 
@@ -117,6 +128,11 @@ public class BikeParametersFragment extends Fragment {
         EventBus.getDefault().register(this);
         boolean status = sharedPreferencesPowerStatus.getBoolean(Constants.POWER_PREFERENCE, false);
         switchPower.setChecked(status);
+        if (status) {
+            this.getView().setBackgroundResource(R.drawable.backgrond2);
+        } else {
+            this.getView().setBackgroundResource(R.drawable.backgrond1);
+        }
     }
 
     @Override
