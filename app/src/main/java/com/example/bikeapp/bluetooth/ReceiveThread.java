@@ -44,8 +44,7 @@ public class ReceiveThread extends Thread {
                             int pos = message.indexOf((char) 13);
                             if (pos > 0) {
                                 int num = Integer.parseInt(message.substring(1, pos));
-                                EventBus.getDefault().post(new InDataModel(num));
-                                //  Log.d("bikeApp", "Парсинг прошёл успешно");
+                                EventBus.getDefault().post(new InDataModel(num, false));
                             }
                         } catch (NumberFormatException ex) {
                             Log.d(TAG, "Пришло не число");
@@ -53,7 +52,7 @@ public class ReceiveThread extends Thread {
                     }
                 }
             } catch (IOException e) {
-                EventBus.getDefault().post(new InDataModel(0));
+                EventBus.getDefault().post(new InDataModel(0, true));
                 break;
             }
         }
@@ -64,6 +63,7 @@ public class ReceiveThread extends Thread {
             outputStream.write(bytes);
         } catch (IOException e) {
             Log.d(TAG, "Ошибка передачи данных");
+
         }
     }
 

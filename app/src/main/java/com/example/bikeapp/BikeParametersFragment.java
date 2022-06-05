@@ -3,6 +3,7 @@ package com.example.bikeapp;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.location.Location;
+import android.media.SoundPool;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -43,6 +44,7 @@ public class BikeParametersFragment extends Fragment {
     private Location prevLocation;
     private TextView percentChargeBattarey;
     private BtConnection btConnection;
+    private boolean isActive = true;
 
     public BikeParametersFragment() {
     }
@@ -51,6 +53,7 @@ public class BikeParametersFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Для новых устройств
         btConnection = BtConnection.createBtConnection(getActivity());
         locationLiveData = new LocationLiveData(getActivity());
         sharedPreferences = getActivity().getSharedPreferences(Constants.ODO_PREFERENCE, Context.MODE_PRIVATE);
@@ -82,7 +85,6 @@ public class BikeParametersFragment extends Fragment {
                 kilometrageView.setText(outData);
                 prevLocation = location;
             }
-            Log.d("bikeApp", "BikeParamSpeed:" + speedKmH);
         });
     }
 
@@ -109,22 +111,27 @@ public class BikeParametersFragment extends Fragment {
         switchPower.setOnClickListener(v -> {
             editPower.putBoolean(Constants.POWER_PREFERENCE, switchPower.isChecked());
             editPower.apply();
-            if (switchPower.isChecked()) {
-                view.setBackgroundResource(R.drawable.backgrond2);
-                try {
-                    btConnection.sendData("1");
-                } catch (NullPointerException ex) {
-                    Toast.makeText(getActivity(), "Подключитесь к электроскутеру", Toast.LENGTH_SHORT).show();
+            if (this.isActive) {
+                if (switchPower.isChecked()) {
+                    view.setBackgroundResource(R.drawable.backgrond2);
+                    try {
+                        btConnection.sendData("1");
+                    } catch (NullPointerException ex) {
+                        Toast.makeText(getActivity(), "Подключитесь к электроскутеру", Toast.LENGTH_SHORT).show();
+                        view.setBackgroundResource(R.drawable.backgrond1);
+                        switchPower.setChecked(false);
+                    }
+                } else {
                     view.setBackgroundResource(R.drawable.backgrond1);
-                    switchPower.setChecked(false);
+                    try {
+                        btConnection.sendData("0");
+                    } catch (NullPointerException ex) {
+                        Toast.makeText(getActivity(), "Подключитесь к электроскутеру", Toast.LENGTH_SHORT).show();
+                    }
                 }
             } else {
-                view.setBackgroundResource(R.drawable.backgrond1);
-                try {
-                    btConnection.sendData("0");
-                } catch (NullPointerException ex) {
-                    Toast.makeText(getActivity(), "Подключитесь к электроскутеру", Toast.LENGTH_SHORT).show();
-                }
+                Toast.makeText(getActivity(), "Подключитесь к электроскутеру", Toast.LENGTH_SHORT).show();
+                switchPower.setChecked(false);
             }
         });
 
@@ -164,5 +171,17 @@ public class BikeParametersFragment extends Fragment {
         String mes = String.valueOf(inData.getBatteryСharge()) + "%";
         percentChargeBattarey.setText(mes);
         Log.d("bileApp", String.valueOf(inData.getBatteryСharge()));
+
+        if (switchPower.isChecked() && inData.isError()) {
+            switchPower.performClick();
+            this.isActive = false;
+        }
+        if (!inData.isError()) {
+            this.isActive = true;
+        }
+
+//        switchPower.setChecked(false);
+//        editPower.putBoolean(Constants.POWER_PREFERENCE, false);
+//        editPower.apply();
     }
 }
