@@ -21,6 +21,7 @@ import androidx.core.content.ContextCompat;
 import com.example.bikeapp.adapter.BtAdapter;
 import com.example.bikeapp.adapter.ListItem;
 import com.example.bikeapp.bluetooth.BtConnection;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,6 +53,8 @@ public class BtListActivity extends AppCompatActivity {
         adapter = new BtAdapter(this, R.layout.bt_list_item, list);
         getPairedDevices();//заполнили лист устройствами
         listView.setAdapter(adapter);
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigation_2);
+        bottomNavigationView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), android.R.color.transparent));
         onItemClickListener();
     }
 
@@ -67,7 +70,7 @@ public class BtListActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.search, menu);
+        getMenuInflater().inflate(R.menu.connect, menu);
         return super.onCreateOptionsMenu(menu);
     }
 

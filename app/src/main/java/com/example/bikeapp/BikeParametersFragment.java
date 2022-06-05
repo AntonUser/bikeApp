@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,6 +20,7 @@ import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 
+import com.example.bikeapp.bluetooth.BtConnection;
 import com.example.bikeapp.geoposition.LocationLiveData;
 import com.example.bikeapp.geoposition.MyLocationListener;
 import com.example.bikeapp.models.InDataModel;
@@ -40,6 +42,7 @@ public class BikeParametersFragment extends Fragment {
     private SharedPreferences.Editor editPower;
     private Location prevLocation;
     private TextView percentChargeBattarey;
+    private BtConnection btConnection;
 
     public BikeParametersFragment() {
     }
@@ -48,6 +51,7 @@ public class BikeParametersFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        btConnection = BtConnection.createBtConnection(getActivity());
         locationLiveData = new LocationLiveData(getActivity());
         sharedPreferences = getActivity().getSharedPreferences(Constants.ODO_PREFERENCE, Context.MODE_PRIVATE);
         sharedPreferencesPowerStatus = getActivity().getSharedPreferences(Constants.POWER_PREFERENCE, Context.MODE_PRIVATE);
@@ -59,6 +63,7 @@ public class BikeParametersFragment extends Fragment {
             long speedKmH = Math.round(location.getSpeed() * 3.6);
 
             speedView.setText(String.valueOf(speedKmH));
+
             if (switchPower.isChecked()) {
                 if (prevLocation == null) {
                     prevLocation = location;
@@ -90,7 +95,6 @@ public class BikeParametersFragment extends Fragment {
         percentChargeBattarey = view.findViewById(R.id.chargePercentBattarey);
         progressBar.setMax(100);
         progressBar.incrementProgressBy(1);
-        //progressBar.setProgress(50);
         MyLocationListener.setUpLocationListener(this.getActivity());
         myLocationListener = new MyLocationListener();
         speedView = view.findViewById(R.id.speedView);
@@ -102,14 +106,25 @@ public class BikeParametersFragment extends Fragment {
         outData = outData.substring(kilometrage.length()) + kilometrage;
         kilometrageView.setText(outData);
 
-
         switchPower.setOnClickListener(v -> {
             editPower.putBoolean(Constants.POWER_PREFERENCE, switchPower.isChecked());
             editPower.apply();
             if (switchPower.isChecked()) {
                 view.setBackgroundResource(R.drawable.backgrond2);
+                try {
+                    btConnection.sendData("1");
+                } catch (NullPointerException ex) {
+                    Toast.makeText(getActivity(), "Подключитесь к электроскутеру", Toast.LENGTH_SHORT).show();
+                    view.setBackgroundResource(R.drawable.backgrond1);
+                    switchPower.setChecked(false);
+                }
             } else {
                 view.setBackgroundResource(R.drawable.backgrond1);
+                try {
+                    btConnection.sendData("0");
+                } catch (NullPointerException ex) {
+                    Toast.makeText(getActivity(), "Подключитесь к электроскутеру", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -143,7 +158,7 @@ public class BikeParametersFragment extends Fragment {
         super.onStop();
     }
 
-    @Subscribe(threadMode = ThreadMode.BACKGROUND)
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(InDataModel inData) {
         progressBar.setProgress(inData.getBatteryСharge());
         String mes = String.valueOf(inData.getBatteryСharge()) + "%";

@@ -46,7 +46,6 @@ public class ConnectThread extends Thread {
         } catch (IOException e) {
             Log.d(TAG, "Ошибка подключения");
             EventBus.getDefault().post("Ошибка подключения");
-//            toastSuccess.show();
             closeConnection();
         }
     }
@@ -64,7 +63,4 @@ public class ConnectThread extends Thread {
         return rThread;
     }
 
-    public synchronized ReceiveThread getRThreadSync() {
-        return rThread;
-    }
 }

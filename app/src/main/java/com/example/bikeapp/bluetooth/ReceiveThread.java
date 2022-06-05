@@ -23,12 +23,10 @@ public class ReceiveThread extends Thread {
         try {
             inputStream = bluetoothSocket.getInputStream();
         } catch (IOException e) {
-
         }
         try {
             outputStream = bluetoothSocket.getOutputStream();
         } catch (IOException e) {
-
         }
     }
 
